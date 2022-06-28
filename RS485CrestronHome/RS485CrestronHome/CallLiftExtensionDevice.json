@@ -1,0 +1,66 @@
+{
+  "CrestronSerialDeviceApi": {
+    "DeviceSupport": {
+      "SupportsFeedback": false,
+      "SupportsUsername": false,
+      "SupportsPassword": false
+    },
+    "DeviceSupport2": [],
+    "GeneralInformation": {
+      "DeviceType": "CallLiftExtensionDevice",
+      "Manufacturer": "HKT",
+      "BaseModel": "Jonathan",
+      "VersionDate": "2022-06-08 12:31:36.000",
+      "DriverVersion": "1.0000.0002",
+      "SdkVersion": "2.9.1",
+      "Description": "Generic RS485 for Crestron Home",
+      "Guid": "CA5BBC46-75DE-4f38-9422-E92EF46F1F5A",
+      "SupportedSeries": [ "Jonathan" ],
+      "SupportedModels": [ "Jonathan" ],
+      "ExtensionDeviceData": {
+        "IsExtensionDevice": true,
+        "IsMediaDevice": false,
+        "IsMediaSource": false
+      }
+    },
+    "Api": {
+      "SupportsConfigurationUpdate": false,
+      "Communication": {
+        "CommunicationType": 0,
+        "Protocol": 2,
+        "Baud": 256,
+        "Parity": 1,
+        "HwHandshake": 0,
+        "SwHandshake": -1,
+        "DataBits": 8,
+        "StopBits": 1,
+        "Port": 8080,
+        "EnableAutoPolling": false,
+        "EnableAutoReconnect": true,
+        "TimeBetweenCommands": 500,
+        "ResponseTimeout": 4000,
+        "WaitForResponse": false,
+        "IpProtocol": 0,
+        "IsUserAdjustable": false,
+        "Authentication": {
+          "Type": "None",
+          "Required": false
+        },
+        "IsSecure": false,
+        "UserAdjustableProperties": [],
+        "DeviceId": 0,
+        "CustomCommands": [
+          {
+            "Name": "test",
+            "Command": "1"
+          }
+        ]
+      },
+      "Feedback": {
+        "MinimumResponseTime": 80000,
+        "MaximumResponseTime": 160000
+      }
+    },
+    "UserAttributes": []
+  }
+}

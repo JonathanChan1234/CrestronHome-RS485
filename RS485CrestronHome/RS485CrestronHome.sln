@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RS485CrestronHome", "RS485CrestronHome\RS485CrestronHome.csproj", "{8BE7D69B-4CCE-4430-A154-D8D3DFFF53E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8BE7D69B-4CCE-4430-A154-D8D3DFFF53E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BE7D69B-4CCE-4430-A154-D8D3DFFF53E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BE7D69B-4CCE-4430-A154-D8D3DFFF53E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BE7D69B-4CCE-4430-A154-D8D3DFFF53E4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8966A77D-DA69-4F28-B953-57454771DAE9}
+	EndGlobalSection
+EndGlobal

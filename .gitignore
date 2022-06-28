@@ -1,0 +1,9 @@
+**/.vs
+**/packages
+**/obj
+
+!**/bin
+**/bin/*
+!**/bin/Debug/
+**/bin/Debug/*
+!**/bin/Debug/IncludeInPkg/
