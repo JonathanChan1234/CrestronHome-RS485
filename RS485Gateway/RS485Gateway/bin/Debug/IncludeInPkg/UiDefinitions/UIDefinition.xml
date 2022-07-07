@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <uidefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://prd-use-rad-assets.azurewebsites.net/ExtensionsSchemaDefinition_v1_0.xsd">
     <version ver="1.0"/>
-    <tile icon="{LiftIcon}" status="{LiftStatusLabel}" action="command:CallLiftOne" navigation="show:MainPage" showinhomepage="#false" showinroompage="#true"/>
+    <tile icon="{LiftIcon}" status="{LiftStatusLabel}" action="command:CallLift" navigation="show:MainPage" showinhomepage="#false" showinroompage="#true"/>
     <layouts>
-        <layout id="MainPage" title="{MainPageLabel}">
+        <layout id="MainPage" title="^MainPageLabel">
             <controls>
-                <button id="callLiftOneId" label="^CallLiftOne" icon="#icGateOpenDisabled" action="command:CallLiftOne"/>
-                <button id="callLiftTwoId" label="^CallLiftTwo" icon="#icGateOpenDisabled" action="command:CallLiftTwo"/>
-                <button id="callLiftThreeId" label="^CallLiftThree" icon="#icGateOpenDisabled" action="command:CallLiftThree"/>
+                <textdisplay id="datareceivedid" title="^DataReceivedLabel" line1label="{DataReceivedProperty}"/>
+                <textentry id="commandEntryId" label="^CommandEntryLabel" value="$commandEntry"/>
+                <button id="callLiftId" label="^CallLiftButtonLabel" icon="#icGateOpenDisabled" action="command:CallLift" actionparameters="$commandEntry"/>
             </controls>
         </layout>
     </layouts>

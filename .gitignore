@@ -7,3 +7,4 @@
 !**/bin/Debug/
 **/bin/Debug/*
 !**/bin/Debug/IncludeInPkg/
+!**/bin/Debug/RS485Gateway.pkg

@@ -8,49 +8,38 @@ namespace RS485Gateway
 {
     public class ARS485Gateway : AGateway, ISimpl, ISerialComport
     {
-
-        public void SendCommandViaTransport(Object sender, string msg)
-        {
-            ConnectionTransport.Send("1", null);
-        }
+        private SimplTransport _transport;
 
         public SimplTransport Initialize(Action<string, object[]> send)
         {
-            ConnectionTransport = new CallLiftSerialTransport
-            {
-                EnableLogging = InternalEnableLogging,
-                CustomLogger = InternalCustomLogger,
-                EnableRxDebug = InternalEnableRxDebug,
-                EnableTxDebug = InternalEnableTxDebug
-            };
-
+            _transport = new SimplTransport { Send = send };
+            ConnectionTransport = _transport;
             Protocol = new CallLiftSerialProtocol(ConnectionTransport, Id)
             {
                 EnableLogging = InternalEnableLogging,
                 CustomLogger = InternalCustomLogger
             };
             Protocol.RxOut += SendRxOut;
-            (Protocol as CallLiftSerialProtocol).TransportSendHandler += SendCommandViaTransport;
-            return ConnectionTransport as SimplTransport;
+            Connected = true;
+            return _transport;
         }
 
         public void Initialize(IComPort comPort)
         {
-            ConnectionTransport = new CallLiftSerialTransport
+            ConnectionTransport = new CommonSerialComport(comPort)
             {
                 EnableLogging = InternalEnableLogging,
                 CustomLogger = InternalCustomLogger,
                 EnableRxDebug = InternalEnableRxDebug,
                 EnableTxDebug = InternalEnableTxDebug
             };
-
             Protocol = new CallLiftSerialProtocol(ConnectionTransport, Id)
             {
                 EnableLogging = InternalEnableLogging,
                 CustomLogger = InternalCustomLogger
             };
             Protocol.RxOut += SendRxOut;
-            (Protocol as CallLiftSerialProtocol).TransportSendHandler += SendCommandViaTransport;
+            Connected = true;
         }
 
         public override void Connect()

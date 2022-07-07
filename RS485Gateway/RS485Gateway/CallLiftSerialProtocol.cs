@@ -17,45 +17,53 @@ namespace RS485Gateway
 
         private CCriticalSection _pairedDevicesLock = new CCriticalSection();
         private const string DeviceID = "1";
-
         #endregion
 
-        public EventHandler<string> TransportSendHandler;
+        private string[] _buffer = new string[1000];
+        private int _byteCount = 0;
 
         #region Initialization
 
         public CallLiftSerialProtocol(ISerialTransport transport, byte id) : base(transport, id)
         {
             ValidateResponse = GatewayValidateResponse;
-            var device = new CallLiftExtensionDevice(DeviceID, "call 10/F");
-            device.CallLiftOneHandler += Device_CallLiftOneHandler;
-            device.CallLiftTwoHandler += Device_CallLiftTwoHandler;
-            device.CallLiftThreeHandler += Device_CallLiftThreeHandler;
+            var device = new CallLiftExtensionDevice(DeviceID, "Test");
+            device.SetConnectionStatus(true);
+            device.CommandSentHandler += CommandSentHandler;
             AddPairedDevice(device);
+        }
 
-            // AddCustomCommand("test", "1", null);
+        private void ClearBuffer()
+        {
+            for (int i = 0; i < 1000; ++i)
+            {
+                _buffer[i] = "";
+            }
+            _byteCount = 0;
+        }
 
-            SendCommand(new CommandSet(
-                "DeviceDiscovery",
-                "DeviceDiscovery",
+        private string GroupBuffer()
+        {
+            string res = "";
+            for (int i = 0; i < 1000; ++i)
+            {
+                if (_buffer[i].Equals("\n")) break;
+                res += _buffer[i];
+            }
+            return res;
+        }
+
+        private void CommandSentHandler(object sender, string command)
+        {
+            if (EnableLogging) Log($"Send Command {command}");
+            ClearBuffer();
+            var commandSet = new CommandSet(
+                "CallLift",
+               command,
                CommonCommandGroupType.Other,
                null,
                false,
-               CommandPriority.High,
-               StandardCommandsEnum.NotAStandardCommand));
-        }
-
-        // Method 1: Using Send Command
-        private void Device_CallLiftOneHandler(object sender, string e)
-        {
-            if (EnableLogging) Log($"Calling SendCommand");
-            var commandSet = new CommandSet(
-                "CallLift",
-               "\x1",
-               CommonCommandGroupType.Other,
-               null,
-               true,
-               CommandPriority.High,
+               CommandPriority.Normal,
                StandardCommandsEnum.NotAStandardCommand)
             {
                 CommandPrepared = true
@@ -63,78 +71,30 @@ namespace RS485Gateway
             SendCommand(commandSet);
         }
 
-        // Method 2: Using SendCustomCommandByName
-        private void Device_CallLiftTwoHandler(object sender, string e)
-        {
-            if (EnableLogging) Log($"Calling SendCustomCommandByname");
-            try
-            {
-                SendCustomCommandByName("test");
-            }
-            catch (Exception error)
-            {
-                Log(error.Message);
-            }
-        }
-
-        // Method 3: Using Transport.SendMethod
-        private void Device_CallLiftThreeHandler(object sender, string e)
-        {
-            if (EnableLogging) Log($"Calling Transport.SendMethod");
-            try
-            {
-                Transport.SendMethod("1", null);
-            }
-            catch (Exception error)
-            {
-                Log(error.Message);
-            }
-            try
-            {
-                TransportSendHandler?.Invoke(this, "1");
-            }
-            catch (Exception error)
-            {
-                Log(error.Message);
-            }
-        }
         #endregion
 
         #region Base Members
-        protected override bool PrepareStringThenSend(CommandSet commandSet)
-        {
-            if (EnableLogging) Log($"PrepareStringThenSend: {commandSet.Command}");
-            commandSet.CommandPrepared = true;
-            var sent = base.PrepareStringThenSend(commandSet);
-            if (EnableLogging)
-            {
-                Log($"PrepareStringThenSend: sent: {sent}");
-                Log($"Commandset prepared: {commandSet.CommandPrepared}");
-            }
-            return true;
-        }
-
-        protected override bool CanQueueCommand(CommandSet commandSet, bool powerOnCommandInQueue)
-        {
-            var canQueue = base.CanQueueCommand(commandSet, powerOnCommandInQueue);
-            if (EnableLogging) Log($"CanQueueCommand: {canQueue}");
-            return canQueue;
-        }
-
-        protected override bool CanSendCommand(CommandSet commandSet)
-        {
-            var canSend = base.CanSendCommand(commandSet);
-            if (EnableLogging) Log($"CanSendCommand: {canSend}");
-            return canSend;
-        }
-
         protected override void ChooseDeconstructMethod(ValidatedRxData validatedData)
         {
-            // if (EnableLogging) Log($"Received from serial: {validatedData.Data}");
-            CallLiftExtensionDevice device;
-            if (_pairedDevices.TryGetValue(DeviceID, out device))
+            if (EnableLogging)
             {
-                device.SetLiftStatus(validatedData.Data);
+                string hex = string.Format("0x{0:X2}", (int)validatedData.Data[0]);
+                Log($"incoming data: {hex}, End of Frame: {validatedData.Data.Equals("\n")}");
+            }
+            // ignore the incoming data if it exceeds the buffer size
+            if (_byteCount > 999) return;
+            _buffer[_byteCount] = validatedData.Data;
+            _byteCount++;
+            if (validatedData.Data.Equals("\n"))
+            {
+                CallLiftExtensionDevice device;
+                string data = GroupBuffer();
+                if (EnableLogging) Log($"Received Data: {data}");
+                ClearBuffer();
+                if (_pairedDevices.TryGetValue(DeviceID, out device))
+                {
+                    device.SetLiftStatus(data);
+                }
             }
         }
 

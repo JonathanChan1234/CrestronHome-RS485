@@ -13,24 +13,22 @@ namespace RS485CrestronHome
     public class CallLiftExtensionDevice : AExtensionDevice
     {
 
-        private const string CallLiftOneCommand = "CallLiftOne";
-        private const string CallLiftTwoCommand = "CallLiftTwo";
-        private const string CallLiftThreeCommand = "CallLiftThree";
+        private const string CallLiftCommand = "CallLift";
 
         private readonly string LiftIconLabel = "LiftIcon";
         private readonly string LiftStatusLabel = "LiftStatusLabel";
-        private readonly string MainPageLabel = "MainPageLabel";
+        private const string DataReceivedProperty = "DataReceivedProperty";
 
         private const string LiftArriveIcon = "icGateOpenDisabled";
         private const string LiftNotArriveIcon = "icGateClosedDisabled";
 
+
         private PropertyValue<string> _liftStatusProperty;
         private PropertyValue<string> _liftIconProperty;
-        private PropertyValue<string> _mainPageLabelProperty;
+        private PropertyValue<string> _dataReceivedProperty;
+        private string _command = "";
 
-        public event EventHandler<string> CallLiftOneHandler;
-        public event EventHandler<string> CallLiftTwoHandler;
-        public event EventHandler<string> CallLiftThreeHandler;
+        public event EventHandler<string> CommandSentHandler;
         private GatewayPairedDeviceInformation _pairedDeviceInfo;
 
         public GatewayPairedDeviceInformation PairedDeviceInformation
@@ -50,7 +48,7 @@ namespace RS485CrestronHome
                 string.Empty);
             _liftStatusProperty = CreateProperty<string>(new PropertyDefinition(LiftStatusLabel, null, DevicePropertyType.String));
             _liftIconProperty = CreateProperty<string>(new PropertyDefinition(LiftIconLabel, null, DevicePropertyType.String));
-            _mainPageLabelProperty = CreateProperty<string>(new PropertyDefinition(MainPageLabel, null, DevicePropertyType.String));
+            _dataReceivedProperty = CreateProperty<string>(new PropertyDefinition(DataReceivedProperty, null, DevicePropertyType.String));
             InitUI();
         }
 
@@ -58,32 +56,29 @@ namespace RS485CrestronHome
         {
             _liftStatusProperty.Value = "0";
             _liftIconProperty.Value = LiftNotArriveIcon;
-            _mainPageLabelProperty.Value = "Main Page";
+            Connected = true;
             Commit();
         }
 
         public void SetLiftStatus(string status)
         {
-            _liftStatusProperty.Value = status;
+            _liftStatusProperty.Value = status == "1" ? "Arrived" : "Not Arrived";
             _liftIconProperty.Value = status == "1" ? LiftArriveIcon : LiftNotArriveIcon;
+            _dataReceivedProperty.Value = status;
             Commit();
         }
         protected override IOperationResult DoCommand(string command, string[] parameters)
         {
             switch (command)
             {
-                case CallLiftOneCommand:
-                    if (EnableLogging) Log("Call Lift One Called");
-                    CallLiftOneHandler?.Invoke(this, "1");
+                case CallLiftCommand:
+                    Log("Call Lift Command called");
+                    if (parameters.Length == 1) _command = parameters[0];
+                    CommandSentHandler?.Invoke(this, _command.Equals("") ? "1" : _command);
                     break;
-                case CallLiftTwoCommand:
-                    if (EnableLogging) Log("Call Lift Two Called");
-                    CallLiftTwoHandler?.Invoke(this, "1");
-                    break;
-                case CallLiftThreeCommand:
-                    if (EnableLogging) Log("Call Lift One Called");
-                    CallLiftThreeHandler?.Invoke(this, "1");
-                    break;
+                default:
+                    ErrorLog.Error($"Invalid Command {command}");
+                    return new OperationResult(OperationResultCode.Error);
             }
             return new OperationResult(OperationResultCode.Success);
         }
@@ -118,6 +113,7 @@ namespace RS485CrestronHome
         public void SetConnectionStatus(bool connected)
         {
             Connected = connected;
+            Commit();
         }
 
     }

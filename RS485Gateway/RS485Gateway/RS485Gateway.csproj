@@ -186,7 +186,6 @@
   <ItemGroup>
     <Compile Include="ARS485Gateway.cs" />
     <Compile Include="CallLiftSerialProtocol.cs" />
-    <Compile Include="CallLiftSerialTransport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
